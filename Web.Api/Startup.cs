@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Web.Api.Services;
+using Web.Application.Common.Interfaces;
 using Web.Infrastructure;
 
 namespace Web.Api
@@ -23,7 +25,10 @@ namespace Web.Api
         {
             services.AddInfrastructure(Configuration);
 
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+
             services.AddControllersWithViews();
+
             services.AddRazorPages();
 
             // In production, the React files will be served from this directory
