@@ -1,7 +1,5 @@
-﻿using IdentityServer4.EntityFramework.Options;
-using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,15 +10,12 @@ using Web.Infrastructure.Models;
 
 namespace Web.Infrastructure.Data
 {
-    public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
         private readonly ICurrentUserService _currentUserService;
-        public ApplicationDbContext(
-            DbContextOptions options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions,
-            ICurrentUserService currentUserService) : base(options, operationalStoreOptions)
+        public ApplicationDbContext( DbContextOptions options, ICurrentUserService currentUserService) : base(options)
         {
-            this._currentUserService = currentUserService;
+            _currentUserService = currentUserService;
         }
 
         public DbSet<Invoice> Invoices { get; set; }
