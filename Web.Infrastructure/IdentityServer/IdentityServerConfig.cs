@@ -30,17 +30,18 @@ namespace Web.Infrastructure.IdentityServer
                     AllowedScopes = { "CleanArchitecture.api" }
                 },
 
-                // interactive ASP.NET Core MVC client
                 new Client
                 {
-                    ClientId = "Swagger",
+                    ClientId = "swagger",
                     ClientSecrets = { new Secret("secret".Sha256()) },
-
                     AllowedGrantTypes = GrantTypes.Code,
 
-                    RedirectUris = { "https://localhost:5002/signin-oidc" },
+                    RequireConsent = false,
+                    RequirePkce = true,
 
-                    PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },
+                    RedirectUris =           { $"https://localhost:44328/swagger/oauth2-redirect.html" },
+                    PostLogoutRedirectUris = { $"https://localhost:44328/swagger/oauth2-redirect.html" },
+                    AllowedCorsOrigins =     { $"https://localhost:44328" },
 
                     AllowedScopes = new List<string>
                     {
@@ -48,7 +49,7 @@ namespace Web.Infrastructure.IdentityServer
                         IdentityServerConstants.StandardScopes.Profile,
                         "CleanArchitecture.api"
                     }
-                }
+                },
             };
     }
 }

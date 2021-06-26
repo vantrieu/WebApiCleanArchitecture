@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
 using Web.Api.Services;
 using Web.Application;
 using Web.Application.Common.Interfaces;
@@ -29,6 +32,34 @@ namespace Web.Api
             services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             services.AddRazorPages();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Clean Architecture .Net Core API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        AuthorizationCode = new OpenApiOAuthFlow
+                        {
+                            TokenUrl = new Uri("/connect/token", UriKind.Relative),
+                            AuthorizationUrl = new Uri("/connect/authorize", UriKind.Relative),
+                            Scopes = new Dictionary<string, string> { { "CleanArchitecture.api", "Clean Architecture .Net Core API" } }
+                        },
+                    },
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                        },
+                        new List<string>{ "CleanArchitecture.api" }
+                    }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +87,16 @@ namespace Web.Api
             app.UseIdentityServer();
 
             app.UseAuthorization();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.OAuthClientId("swagger");
+                c.OAuthClientSecret("secret");
+                c.OAuthUsePkce();
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Clean Architecture .Net Core API");
+            });
 
             app.UseEndpoints(endpoints =>
             {
