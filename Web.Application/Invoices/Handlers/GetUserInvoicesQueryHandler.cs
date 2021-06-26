@@ -1,9 +1,8 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Web.Application.Common.Interfaces;
@@ -16,9 +15,13 @@ namespace Web.Application.Invoices.Handlers
     {
         private readonly IApplicationDbContext _context;
 
-        public GetUserInvoicesQueryHandler(IApplicationDbContext context)
+        private readonly IMapper _mapper;
+
+        public GetUserInvoicesQueryHandler(IApplicationDbContext context, IMapper mapper)
         {
-            this._context = context;
+            _context = context;
+
+            _mapper = mapper;
         }
         public async Task<IEnumerable<InvoiceVm>> Handle(GetUserInvoicesQuery request, CancellationToken cancellationToken)
         {
@@ -26,29 +29,7 @@ namespace Web.Application.Invoices.Handlers
             var invoices = await _context.Invoices.Include(i => i.InvoiceItems).Where(i => i.CreatedBy.Equals(request.UserId)).ToListAsync();
             if(invoices != null)
             {
-                result = invoices.Select(i => new InvoiceVm
-                {
-                    AmountPaid = i.AmountPaid,
-                    Date = i.Date,
-                    Discount = i.Discount,
-                    DiscountType = i.DiscountType,
-                    DueDate = i.DueDate,
-                    From = i.From,
-                    InvoiceNumber = i.InvoiceNumber,
-                    Logo = i.Logo,
-                    PaymentTerms = i.PaymentTerms,
-                    Tax = i.Tax,
-                    TaxType = i.TaxType,
-                    To = i.To,
-                    InvoiceItems = i.InvoiceItems.Select(x => new InvoiceItemVm
-                    {
-                        Id = x.Id,
-                        Item = x.Item,
-                        Quantity = x.Quantity,
-                        Rate = x.Rate
-                    }).ToList(),
-                    CreatedAt = i.CreatedAt
-                }).ToList();
+                result = _mapper.Map<List<InvoiceVm>>(invoices);
             }
             return result;
         }

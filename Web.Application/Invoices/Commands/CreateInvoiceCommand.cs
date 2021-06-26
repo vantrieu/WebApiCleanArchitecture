@@ -6,7 +6,7 @@ using Web.Domain.Enums;
 
 namespace Web.Application.Invoices.Commands
 {
-    public class CreateInvoiceCommand : IRequest<int>
+    public class CreateInvoiceCommand : IRequest<InvoiceVm>
     {
         public CreateInvoiceCommand()
         {
