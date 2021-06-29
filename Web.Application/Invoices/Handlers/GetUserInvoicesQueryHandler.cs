@@ -17,16 +17,21 @@ namespace Web.Application.Invoices.Handlers
 
         private readonly IMapper _mapper;
 
-        public GetUserInvoicesQueryHandler(IApplicationDbContext context, IMapper mapper)
+        private readonly ICurrentUserService _currentUserService;
+
+        public GetUserInvoicesQueryHandler(IApplicationDbContext context, IMapper mapper, ICurrentUserService currentUserService)
         {
             _context = context;
 
             _mapper = mapper;
+
+            _currentUserService = currentUserService;
         }
         public async Task<IEnumerable<InvoiceVm>> Handle(GetUserInvoicesQuery request, CancellationToken cancellationToken)
         {
             var result = new List<InvoiceVm>();
-            var invoices = await _context.Invoices.Include(i => i.InvoiceItems).Where(i => i.CreatedBy.Equals(request.UserId)).ToListAsync();
+            var invoices = await _context.Invoices.Where(i => i.CreatedBy == _currentUserService.UserId.ToString())
+                .Include(i => i.InvoiceItems).ToListAsync();
             if(invoices != null)
             {
                 result = _mapper.Map<List<InvoiceVm>>(invoices);

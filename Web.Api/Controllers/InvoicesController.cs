@@ -15,19 +15,16 @@ namespace Web.Api.Controllers
     {
         private readonly IMediator _mediator;
 
-        private readonly ICurrentUserService _currentUserService;
-
-        public InvoicesController(IMediator mediator, ICurrentUserService currentUserService)
+        public InvoicesController(IMediator mediator)
         {
             _mediator = mediator;
-
-            _currentUserService = currentUserService;
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetList()
         {
-            var result = await _mediator.Send(new GetUserInvoicesQuery { UserId = _currentUserService.UserId });
+            var result = await _mediator.Send(new GetUserInvoicesQuery());
 
             return Ok(result);
         }

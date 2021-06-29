@@ -13,7 +13,8 @@ namespace Web.Infrastructure.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
         private readonly ICurrentUserService _currentUserService;
-        public ApplicationDbContext( DbContextOptions options, ICurrentUserService currentUserService) : base(options)
+
+        public ApplicationDbContext( DbContextOptions<ApplicationDbContext> options, ICurrentUserService currentUserService) : base(options)
         {
             _currentUserService = currentUserService;
         }
@@ -30,7 +31,7 @@ namespace Web.Infrastructure.Data
                 {
                     case EntityState.Added:
 
-                        entry.Entity.CreatedBy = _currentUserService.UserId;
+                        entry.Entity.CreatedBy = _currentUserService.UserId.ToString();
 
                         entry.Entity.CreatedAt = DateTime.UtcNow;
 
@@ -38,7 +39,7 @@ namespace Web.Infrastructure.Data
 
                     case EntityState.Modified:
 
-                        entry.Entity.CreatedBy = _currentUserService.UserId;
+                        entry.Entity.CreatedBy = _currentUserService.UserId.ToString();
 
                         entry.Entity.CreatedAt = DateTime.UtcNow;
 
